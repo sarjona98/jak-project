@@ -410,6 +410,11 @@ void CommonOceanRenderer::handle_mid_adgif(const u8* data, u32 offset) {
       case GsRegisterAddress::TEX1_1: {
         GsTex1 reg(value);
         ASSERT(reg.mmag());
+        // the ocean texture is the only mipmapped texture here, the envmap has mxl = 0.
+        if (reg.mxl() > 0) {
+          m_mid_tex1 = reg;
+          m_mid_tex1_valid = true;
+        }
       } break;
       case GsRegisterAddress::CLAMP_1: {
         bool s = value & 0b001;
@@ -465,6 +470,19 @@ void CommonOceanRenderer::flush_mid(SharedRenderState* render_state, ScopedProfi
   glUniform4f(glGetUniformLocation(render_state->shaders[ShaderId::OCEAN_COMMON].id(), "fog_color"),
               render_state->fog_color[0] / 255.f, render_state->fog_color[1] / 255.f,
               render_state->fog_color[2] / 255.f, render_state->fog_intensity / 255);
+
+  // The mip levels of the ocean texture fade out alpha, which controls the envmap strength.
+  // Selecting the mip level like the GS keeps the envmap fade in sync with the tiles that have
+  // envmap enabled.
+  bool use_ps2_lod = ps2_mip_lod && m_mid_tex1_valid;
+  glUniform1i(glGetUniformLocation(render_state->shaders[ShaderId::OCEAN_COMMON].id(), "ps2_lod"),
+              use_ps2_lod);
+  if (use_ps2_lod) {
+    // K is signed 12-bit fixed point with 4 fractional bits
+    int k = (int)(m_mid_tex1.k() << 20) >> 20;
+    glUniform3f(glGetUniformLocation(render_state->shaders[ShaderId::OCEAN_COMMON].id(), "lod_lkm"),
+                (float)(1 << m_mid_tex1.l()), k / 16.f, (float)m_mid_tex1.mxl());
+  }
 
   glDepthMask(GL_TRUE);
   glEnable(GL_DEPTH_TEST);

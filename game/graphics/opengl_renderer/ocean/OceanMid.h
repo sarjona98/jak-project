@@ -10,6 +10,7 @@ class OceanMid {
   OceanMid();
   void run(DmaFollower& dma, SharedRenderState* render_state, ScopedProfilerNode& prof);
   void run_jak2(DmaFollower& dma, SharedRenderState* render_state, ScopedProfilerNode& prof);
+  CommonOceanRenderer& common() { return m_common_ocean_renderer; }
 
  private:
   void run_call0();
