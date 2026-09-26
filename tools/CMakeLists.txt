@@ -16,6 +16,14 @@ add_executable(vag_packer
         vag_packer.cpp)
 target_link_libraries(vag_packer common)
 
+add_executable(bank_unpacker
+        bank_unpacker.cpp)
+target_link_libraries(bank_unpacker common)
+
+add_executable(bank_packer
+        bank_packer.cpp)
+target_link_libraries(bank_packer common)
+
 add_executable(memory_dump_tool
         memory_dump_tool/main.cpp)
 target_link_libraries(memory_dump_tool common decomp)
