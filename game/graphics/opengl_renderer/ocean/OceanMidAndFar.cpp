@@ -9,6 +9,7 @@ OceanMidAndFar::OceanMidAndFar(const std::string& name, int my_id)
       m_texture_renderer(true) {}
 
 void OceanMidAndFar::draw_debug_window() {
+  ImGui::Checkbox("mid PS2 mip LOD", &m_mid_renderer.common().ps2_mip_lod);
   if (ImGui::TreeNode("envmap")) {
     m_envmap_renderer.draw_debug_window();
     ImGui::TreePop();

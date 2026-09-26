@@ -14,7 +14,15 @@ class CommonOceanRenderer {
   void kick_from_mid(const u8* data);
   void flush_mid(SharedRenderState* render_state, ScopedProfilerNode& prof);
 
+  // select the mid ocean texture's mip level from Q like the PS2 GS does, instead of
+  // letting OpenGL pick it from screen-space derivatives.
+  bool ps2_mip_lod = true;
+
  private:
+  // tex1 of the mid ocean texture, used for the PS2 mip level selection
+  GsTex1 m_mid_tex1;
+  bool m_mid_tex1_valid = false;
+
   void handle_near_vertex_gif_data_fan(const u8* data, u32 offset, u32 loop);
   void handle_near_vertex_gif_data_strip(const u8* data, u32 offset, u32 loop);
 
